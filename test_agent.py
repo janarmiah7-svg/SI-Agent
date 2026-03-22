@@ -29,6 +29,7 @@ class FindEntityTests(unittest.TestCase):
 
         self.assertIsNotNone(entity)
         self.assertEqual(entity["canonical_name"], "Gandalf")
+        self.assertIn("stary złodziej", entity["aliases"])
 
 
 class DescribeEntityTests(unittest.TestCase):

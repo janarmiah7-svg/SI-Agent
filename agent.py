@@ -86,7 +86,7 @@ def merge_records(records: list[dict]) -> list[dict]:
 
 
 MERGED_SOURCE_RECORDS = merge_records(SOURCE_RECORDS)
-_RECORDS_CACHE: dict[tuple, list[dict]] = {}
+_records_cache: dict[tuple, list[dict]] = {}
 
 
 def _records_cache_key(records: list[dict]) -> tuple:
@@ -108,7 +108,7 @@ def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
         entities = MERGED_SOURCE_RECORDS
     else:
         cache_key = _records_cache_key(records)
-        entities = _RECORDS_CACHE.setdefault(cache_key, merge_records(records))
+        entities = _records_cache.setdefault(cache_key, merge_records(records))
     for entity in entities:
         names = [entity["canonical_name"], *entity["aliases"]]
         if any(normalize(name) == needle for name in names):
