@@ -13,6 +13,7 @@ from tickets import (
     extract_city,
     format_ticket,
     get_hans_zimmer_tickets,
+    is_availability_query,
     is_hans_zimmer_query,
     is_ticket_query,
 )
@@ -45,6 +46,17 @@ def process_query(query: str) -> str:
         return GREETING + "\n\n" + HELP_TEXT
 
     text = query.strip()
+
+    if is_availability_query(text):
+        tickets = get_hans_zimmer_tickets()
+        header = "Tak, mam bilety! Oto dostępne bilety na koncert Hansa Zimmera:\n"
+        sections = [header]
+        for i, ticket in enumerate(tickets, 1):
+            sections.append(f"[{i}]\n{format_ticket(ticket)}")
+        sections.append(
+            "\nKup bilety bezpośrednio przez podane linki lub odwiedź ticketmaster.pl"
+        )
+        return "\n\n".join(sections)
 
     if is_hans_zimmer_query(text) and is_ticket_query(text):
         city = extract_city(text)

@@ -3,7 +3,6 @@ Concert ticket search functionality for the SI-Agent.
 Supports fetching ticket information for Hans Zimmer concerts.
 """
 
-import re
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -55,6 +54,23 @@ class TicketInfo:
     url: str
     currency: str = "PLN"
     extra: str = ""
+
+
+AVAILABILITY_KEYWORDS_PL = [
+    "masz te bilety",
+    "masz bilety",
+    "czy masz bilety",
+    "macie bilety",
+    "czy macie bilety",
+    "masz te pasy",
+    "masz pasy",
+    "czy masz pasy",
+    "macie pasy",
+    "masz te wejściówki",
+    "masz wejściówki",
+    "do you have tickets",
+    "have tickets",
+]
 
 
 HANS_ZIMMER_CONCERTS: list[TicketInfo] = [
@@ -113,6 +129,12 @@ def is_ticket_query(text: str) -> bool:
     has_ticket = any(kw in lower for kw in TICKET_KEYWORDS_PL)
     has_concert = any(kw in lower for kw in CONCERT_KEYWORDS_PL)
     return has_ticket or has_concert
+
+
+def is_availability_query(text: str) -> bool:
+    """Return True if text is asking whether the agent has tickets (e.g. 'masz te bilety?')."""
+    lower = text.lower()
+    return any(kw in lower for kw in AVAILABILITY_KEYWORDS_PL)
 
 
 def get_hans_zimmer_tickets(city: Optional[str] = None) -> list[TicketInfo]:

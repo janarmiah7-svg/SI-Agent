@@ -10,9 +10,43 @@ from tickets import (
     extract_city,
     format_ticket,
     get_hans_zimmer_tickets,
+    is_availability_query,
     is_hans_zimmer_query,
     is_ticket_query,
 )
+
+
+# ---------------------------------------------------------------------------
+# is_availability_query
+# ---------------------------------------------------------------------------
+
+class TestIsAvailabilityQuery:
+    def test_masz_te_bilety(self):
+        assert is_availability_query("masz te bilety?") is True
+
+    def test_masz_bilety(self):
+        assert is_availability_query("masz bilety") is True
+
+    def test_czy_masz_bilety(self):
+        assert is_availability_query("czy masz bilety na to?") is True
+
+    def test_macie_bilety(self):
+        assert is_availability_query("macie bilety na Hans Zimmer?") is True
+
+    def test_masz_te_pasy(self):
+        assert is_availability_query("masz te pasy?") is True
+
+    def test_case_insensitive(self):
+        assert is_availability_query("Masz Te Bilety?") is True
+
+    def test_english(self):
+        assert is_availability_query("do you have tickets") is True
+
+    def test_unrelated(self):
+        assert is_availability_query("jaka jest pogoda") is False
+
+    def test_hans_zimmer_named_query_not_availability(self):
+        assert is_availability_query("bilety na koncert hansa zimmera") is False
 
 
 # ---------------------------------------------------------------------------
@@ -146,3 +180,19 @@ class TestProcessQuery:
     def test_unrelated_query_not_understood(self):
         response = process_query("jaka jest pogoda w Warszawie")
         assert response == NOT_UNDERSTOOD
+
+    def test_masz_te_bilety_returns_tickets(self):
+        response = process_query("masz te bilety?")
+        assert "Tak, mam bilety" in response
+        assert "Hans Zimmer" in response
+        assert "ticketmaster" in response.lower()
+
+    def test_masz_bilety_returns_all_concerts(self):
+        response = process_query("masz bilety")
+        assert "Hans Zimmer" in response
+        for ticket in HANS_ZIMMER_CONCERTS:
+            assert ticket.venue in response
+
+    def test_czy_masz_bilety_returns_tickets(self):
+        response = process_query("czy masz bilety na to?")
+        assert "Tak, mam bilety" in response
