@@ -80,10 +80,14 @@ def merge_records(records: list[dict]) -> list[dict]:
     return merged
 
 
+MERGED_SOURCE_RECORDS = merge_records(SOURCE_RECORDS)
+
+
 def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
     """Return the merged entity that matches *query*."""
     needle = normalize(query)
-    for entity in merge_records(records or SOURCE_RECORDS):
+    entities = MERGED_SOURCE_RECORDS if records is None else merge_records(records)
+    for entity in entities:
         names = [entity["canonical_name"], *entity["aliases"]]
         if any(normalize(name) == needle for name in names):
             return entity

@@ -13,12 +13,11 @@ to the same entity. In the example dataset, `Gandalf`, `Gandalf Szary`, and
 ## Run
 
 ```bash
-python /home/runner/work/SI-Agent/SI-Agent/agent.py
+python agent.py
 ```
 
 ## Tests
 
 ```bash
-cd /home/runner/work/SI-Agent/SI-Agent
 python -m unittest -q
 ```
