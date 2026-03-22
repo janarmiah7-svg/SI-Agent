@@ -86,7 +86,7 @@ def merge_records(records: list[dict]) -> list[dict]:
 
 
 MERGED_SOURCE_RECORDS = merge_records(SOURCE_RECORDS)
-_MERGED_RECORDS_CACHE: dict[tuple, list[dict]] = {}
+_RECORDS_CACHE: dict[tuple, list[dict]] = {}
 
 
 def _records_cache_key(records: list[dict]) -> tuple:
@@ -108,7 +108,7 @@ def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
         entities = MERGED_SOURCE_RECORDS
     else:
         cache_key = _records_cache_key(records)
-        entities = _MERGED_RECORDS_CACHE.setdefault(cache_key, merge_records(records))
+        entities = _RECORDS_CACHE.setdefault(cache_key, merge_records(records))
     for entity in entities:
         names = [entity["canonical_name"], *entity["aliases"]]
         if any(normalize(name) == needle for name in names):
@@ -122,8 +122,7 @@ def describe_entity(query: str, records: list[dict] | None = None) -> str:
     if entity is None:
         return "Nie znaleziono powiązanego bytu."
 
-    alias_values = [alias for alias in entity["aliases"] if alias]
-    aliases = ", ".join(alias_values) if alias_values else "brak aliasów"
+    aliases = ", ".join(entity["aliases"]) if entity["aliases"] else "brak aliasów"
     sources = ", ".join(entity["sources"])
     return (
         f"{entity['canonical_name']} to ten sam byt co: {aliases}. "
