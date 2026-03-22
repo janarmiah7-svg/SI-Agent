@@ -10,7 +10,7 @@ class NormalizeTests(unittest.TestCase):
         self.assertEqual(normalize(" Stary Złodziej "), "stary zlodziej")
 
 
-class MergeRecordTests(unittest.TestCase):
+class MergeRecordsTests(unittest.TestCase):
     def test_merge_records_combines_matching_sources(self):
         merged = merge_records(SOURCE_RECORDS)
 
