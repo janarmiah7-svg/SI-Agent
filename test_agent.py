@@ -38,6 +38,7 @@ class DescribeEntityTests(unittest.TestCase):
         self.assertIn("Gandalf", description)
         self.assertIn("CEIDG", description)
         self.assertIn("KRS", description)
+        self.assertIn("network_localization", description)
 
     def test_unknown_entity_returns_default_message(self):
         self.assertEqual(
