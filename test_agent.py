@@ -22,12 +22,16 @@ class MergeRecordsTests(unittest.TestCase):
         )
         self.assertIn("stary złodziej", merged[0]["aliases"])
 
+
+class FindEntityTests(unittest.TestCase):
     def test_find_entity_resolves_alias_to_canonical_name(self):
         entity = find_entity("stary zlodziej")
 
         self.assertIsNotNone(entity)
         self.assertEqual(entity["canonical_name"], "Gandalf")
 
+
+class DescribeEntityTests(unittest.TestCase):
     def test_describe_entity_lists_combined_sources(self):
         description = describe_entity("Mithrandir")
 
