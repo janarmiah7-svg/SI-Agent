@@ -86,7 +86,7 @@ def merge_records(records: list[dict]) -> list[dict]:
 
 
 MERGED_SOURCE_RECORDS = merge_records(SOURCE_RECORDS)
-_records_cache: dict[tuple, list[dict]] = {}
+_merged_records_cache: dict[tuple, list[dict]] = {}
 
 
 def _records_cache_key(records: list[dict]) -> tuple:
@@ -108,7 +108,7 @@ def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
         entities = MERGED_SOURCE_RECORDS
     else:
         cache_key = _records_cache_key(records)
-        entities = _records_cache.setdefault(cache_key, merge_records(records))
+        entities = _merged_records_cache.setdefault(cache_key, merge_records(records))
     for entity in entities:
         names = [entity["canonical_name"], *entity["aliases"]]
         if any(normalize(name) == needle for name in names):
@@ -117,7 +117,7 @@ def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
 
 
 def describe_entity(query: str, records: list[dict] | None = None) -> str:
-    """Describe how a query maps to a merged entity."""
+    """Describe how a query maps to a merged entity in Polish."""
     entity = find_entity(query, records)
     if entity is None:
         return "Nie znaleziono powiązanego bytu."
