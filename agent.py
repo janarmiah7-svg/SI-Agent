@@ -36,7 +36,9 @@ def merge_records(records: list[dict]) -> list[dict]:
 
     for record in records:
         aliases = set(record.get("aliases", []))
-        tokens = {normalize(record["name"]), *(normalize(alias) for alias in aliases)}
+        tokens = {normalize(record["name"])} | {
+            normalize(alias) for alias in aliases if alias
+        }
         match_indexes = [
             index for index, entity in enumerate(entities) if entity["_tokens"] & tokens
         ]
@@ -120,7 +122,8 @@ def describe_entity(query: str, records: list[dict] | None = None) -> str:
     if entity is None:
         return "Nie znaleziono powiązanego bytu."
 
-    aliases = ", ".join(entity["aliases"]) or "brak aliasów"
+    alias_values = [alias for alias in entity["aliases"] if alias]
+    aliases = ", ".join(alias_values) if alias_values else "brak aliasów"
     sources = ", ".join(entity["sources"])
     return (
         f"{entity['canonical_name']} to ten sam byt co: {aliases}. "
