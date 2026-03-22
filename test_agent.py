@@ -23,7 +23,7 @@ class AskTests(unittest.TestCase):
         self.assertIn("Stany Zjednoczone nie upadły", answer)
 
     def test_unknown_question_returns_default_message(self) -> None:
-        self.assertEqual(ask("co jadl gandalf"), DEFAULT_ANSWER)
+        self.assertEqual(ask("co jadł gandalf"), DEFAULT_ANSWER)
 
 
 if __name__ == "__main__":
