@@ -37,9 +37,11 @@ def merge_records(records: list[dict]) -> list[dict]:
     for record in records:
         aliases = set(record.get("aliases", []))
         tokens = {normalize(record["name"]), *(normalize(alias) for alias in aliases)}
-        matches = [entity for entity in entities if entity["_tokens"] & tokens]
+        match_indexes = [
+            index for index, entity in enumerate(entities) if entity["_tokens"] & tokens
+        ]
 
-        if not matches:
+        if not match_indexes:
             entities.append(
                 {
                     "canonical_name": record["name"],
@@ -50,7 +52,7 @@ def merge_records(records: list[dict]) -> list[dict]:
             )
             continue
 
-        primary = matches[0]
+        primary = entities[match_indexes[0]]
         primary["sources"].add(record["source"])
         primary["aliases"].update(aliases)
         primary["_tokens"].update(tokens)
@@ -58,11 +60,12 @@ def merge_records(records: list[dict]) -> list[dict]:
         if normalize(record["name"]) != normalize(primary["canonical_name"]):
             primary["aliases"].add(record["name"])
 
-        for extra in matches[1:]:
+        for index in reversed(match_indexes[1:]):
+            extra = entities[index]
             primary["sources"].update(extra["sources"])
             primary["aliases"].update(extra["aliases"])
             primary["_tokens"].update(extra["_tokens"])
-            entities.remove(extra)
+            del entities[index]
 
     merged = []
     for entity in entities:
@@ -81,12 +84,29 @@ def merge_records(records: list[dict]) -> list[dict]:
 
 
 MERGED_SOURCE_RECORDS = merge_records(SOURCE_RECORDS)
+_CUSTOM_MERGE_CACHE: dict[tuple, list[dict]] = {}
+
+
+def _records_cache_key(records: list[dict]) -> tuple:
+    """Return a hashable cache key for a list of source records."""
+    return tuple(
+        (
+            record["source"],
+            record["name"],
+            tuple(record.get("aliases", [])),
+        )
+        for record in records
+    )
 
 
 def find_entity(query: str, records: list[dict] | None = None) -> dict | None:
     """Return the merged entity that matches *query*."""
     needle = normalize(query)
-    entities = MERGED_SOURCE_RECORDS if records is None else merge_records(records)
+    if records is None:
+        entities = MERGED_SOURCE_RECORDS
+    else:
+        cache_key = _records_cache_key(records)
+        entities = _CUSTOM_MERGE_CACHE.setdefault(cache_key, merge_records(records))
     for entity in entities:
         names = [entity["canonical_name"], *entity["aliases"]]
         if any(normalize(name) == needle for name in names):
